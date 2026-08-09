@@ -1,4 +1,5 @@
-let name = 'Nate';
+import {moo} from "./moo.js";
 
-console.log(`moo, ${name}!`);
+
+console.log(moo("Nate"));
 
