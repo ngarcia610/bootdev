@@ -14,3 +14,4 @@ https://www.boot.dev/u/double
 5. Heifer: Working directory for the course "Learn Javascript"
 6. Go: Working directory for the course "Learn Golang"
 7. Ai-agent: Builds a tiny coding agent that can read files, edit code, run Python, and loop on feedback.
+8. Chirpy: Directory for Learn HTTP Servers in Go.
