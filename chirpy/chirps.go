@@ -11,12 +11,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/google/uuid"
+	"github.com/ngarcia610/bootdev/tree/main/chirpy/internal/auth"
 	"github.com/ngarcia610/bootdev/tree/main/chirpy/internal/database"
 )
 
 type createChirpRequest struct {
-	Body   string    `json:"body"`
-	UserID uuid.UUID `json:"user_id"`
+	Body string `json:"body"`
 }
 
 type Chirp struct {
@@ -28,6 +28,17 @@ type Chirp struct {
 }
 
 func (cfg *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Invalid or missing token")
+		return
+	}
+	userID, err := auth.ValidateJWT(token, cfg.jwtSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Invalid or missing token")
+		return
+	}
+
 	request := createChirpRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body")
@@ -41,7 +52,7 @@ func (cfg *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request)
 
 	dbChirp, err := cfg.db.CreateChirp(r.Context(), database.CreateChirpParams{
 		Body:   cleanChirp(request.Body),
-		UserID: request.UserID,
+		UserID: userID,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create chirp")
